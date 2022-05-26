@@ -28,13 +28,16 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/order', async (req, res) => {
+            const email = req.query.email
+            const query = { email: email }
+            const order = await orderCollection.find(query).toArray();
+            res.send(order)
+        })
+
         app.post('/order', async (req, res) => {
             const order = req.body;
-            const query = { name: order.name, email: order.email }
-            const exists = await orderCollection.findOne(query)
-            if (exists) {
-                return res.send({ success: false, order: exists })
-            }
+
             const result = await orderCollection.insertOne(order)
             return res.send({ success: true, result })
         })
