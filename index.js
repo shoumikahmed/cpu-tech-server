@@ -65,20 +65,38 @@ async function run() {
             return res.send({ success: true, result })
         })
 
+        app.get('/orders', async (req, res) => {
+            const order = await orderCollection.find().toArray()
+            res.send(order)
+        })
+
         app.get('/user', verifyJWT, async (req, res) => {
             const users = await userCollection.find().toArray()
             res.send(users)
         })
 
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await userCollection.findOne({ email: email });
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin })
+        })
+
         app.put('/user/admin/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
-
-            const filter = { email: email }
-            const updateDoc = {
-                $set: { role: 'admin' },
+            const requester = req.decoded.email;
+            const requesterAccount = await userCollection.findOne({ email: requester })
+            if (requesterAccount.role === 'admin') {
+                const filter = { email: email }
+                const updateDoc = {
+                    $set: { role: 'admin' },
+                }
+                const result = await userCollection.updateOne(filter, updateDoc)
+                res.send(result)
             }
-            const result = await userCollection.updateOne(filter, updateDoc)
-            res.send(result)
+            else {
+                res.status(403).send({ message: 'forbidden' })
+            }
         })
 
         app.put('/user/:email', async (req, res) => {
@@ -114,9 +132,31 @@ async function run() {
             res.send(result)
         })
 
+        app.delete('/tool/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const result = await toolCollection.deleteOne(query)
+            res.send(result)
+        })
+
+        app.delete('/order/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const result = await orderCollection.deleteOne(query)
+            res.send(result)
+        })
+
+        app.post('/tool', async (req, res) => {
+            const product = req.body
+            const result = await toolCollection.insertOne(product)
+            res.send(result)
+        })
+
+
+
     }
     finally {
-        //  akjsfhiuhe
+
     }
 }
 
