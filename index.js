@@ -19,6 +19,7 @@ async function run() {
         const toolCollection = client.db("cpu-manufacturer").collection("tools");
         const userCollection = client.db("cpu-manufacturer").collection("users");
         const orderCollection = client.db("cpu-manufacturer").collection("orders");
+        const reviewCollection = client.db("cpu-manufacturer").collection("reviews");
 
 
         app.get('/tool', async (req, res) => {
@@ -59,7 +60,13 @@ async function run() {
             const newItem = req.body
             const result = await reviewCollection.insertOne(newItem);
             res.send(result)
+        })
 
+        app.get('/review', async (req, res) => {
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const result = await cursor.toArray()
+            res.send(result)
         })
 
         app.get('/tool/:id', async (req, res) => {
