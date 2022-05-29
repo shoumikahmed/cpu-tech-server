@@ -1,6 +1,6 @@
 # Cpu Tech
 
-[Live link] ()
+[Live link] (https://cpu-manufacturer-assignm-47d23.web.app/)
 
 # Bullet Point
 
